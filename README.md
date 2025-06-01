@@ -2,7 +2,6 @@
 
 Mood Pulse App, kullanıcıların duygusal durumlarını emojiler aracılığıyla ifade edebilecekleri ve topluluk içindeki duygu durumlarını gerçek zamanlı olarak görüntüleyebilecekleri bir web uygulamasıdır. Stellar Blockchain ağı üzerinde çalışan bu uygulama, Freighter cüzdan entegrasyonu ile birlikte güvenli bir kullanıcı deneyimi sunmaktadır.
 
-![Mood Pulse App Banner](https://i.imgur.com/XBpGXjL.png)
 
 ## İçindekiler
 
