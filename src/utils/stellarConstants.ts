@@ -21,9 +21,9 @@ export const STELLAR_NETWORKS = {
 // Default network
 export const DEFAULT_NETWORK = STELLAR_NETWORKS.TESTNET;
 
-// Contract ID for the MoodPulse emoji recording
-// Using a pre-deployed test contract from Stellar Soroban examples
-export const MOODPULSE_CONTRACT_ID = 'CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC';
+// Contract ID - Using a transaction-based approach instead of a specific contract
+// Since we're using Stellar transactions to record emoji votes
+export const MOODPULSE_CONTRACT_ID = 'GBZX4364PEPQTDICVS7GONLMPJEQ6TRT6IMEZWZT4KKSMEDW2HTQRSG6';
 
 // Known contract functions
 export const CONTRACT_FUNCTIONS = {

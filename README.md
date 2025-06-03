@@ -27,7 +27,7 @@ Mood Pulse App, kullanıcıların duygusal durumlarını emojiler aracılığıy
 
 ## Demo
 
-Uygulamanın canlı demo sürümüne [buradan](https://github.com/batuyukselen/mood-pulse-app) erişebilirsiniz.
+Uygulamanın canlı demo sürümüne [buradan](https://mood-pulse-app.netlify.app) erişebilirsiniz.
 
 ## Teknolojiler
 
@@ -80,17 +80,17 @@ Mood Pulse App, Stellar Blockchain üzerinde çalışan [Freighter Cüzdan](http
 
 Mood Pulse App, emoji seçimlerini ve topluluk verilerini Stellar Testnet üzerinde kaydeder. Bu işlemler şu yöntemlerle gerçekleştirilir:
 
-### Kontrat ID
+### İşlem Kayıt Adresi
 
-Uygulama, aşağıdaki kontrat ID'sini kullanır:
+Uygulamanın kullandığı Stellar adresi:
 
 ```
-CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC
+GBZX4364PEPQTDICVS7GONLMPJEQ6TRT6IMEZWZT4KKSMEDW2HTQRSG6
 ```
 
 ### Stellar Explorer Bağlantıları
 
-- [Kontratı Stellar Explorer'da görüntüle](https://testnet.stellar.expert/contract/CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC)
+- [İşlem kaydı adresini Stellar Explorer'da görüntüle](https://testnet.stellar.expert/explorer/public/account/GBZX4364PEPQTDICVS7GONLMPJEQ6TRT6IMEZWZT4KKSMEDW2HTQRSG6)
 - [Testnet'teki tüm işlemleri görüntüle](https://testnet.stellar.expert/explorer/public)
 
 ### İşlem Detayları
@@ -104,10 +104,9 @@ Emoji seçimleri, Stellar işlemleri içinde aşağıdaki şekilde kaydedilir:
 ## Kullanım
 
 1. **Cüzdan Bağlantısı**: Sayfanın üst kısmındaki "Cüzdan Bağla" butonuna tıklayarak Freighter cüzdanınızı bağlayın.
-2. **Duygu Seçimi**: Sunulan beş emoji seçeneğinden (😀 Mutlu, 😢 Üzgün, 😍 Aşık, 😠 Sinirli, 🤔 Düşünceli) mevcut duygu durumunuzu en iyi yansıtanı seçin.
-3. **Canlı Grafiği Görüntüleme**: Topluluğun duygu durumunu gösteren canlı grafikleri sayfanın orta kısmında görüntüleyebilirsiniz.
-4. **Katkıda Bulunma**: "Your Voice Matters" bölümünden kendi duygu durumunuzu ekleyebilirsiniz.
-5. **İşlemleri Görüntüleme**: Emoji seçiminizden sonra, Stellar Explorer bağlantısını kullanarak işleminizi görüntüleyebilirsiniz.
+2. **Duygu Seçimi**: "How are you feeling today?" başlığı altında sunulan emoji seçeneklerinden (😀 Mutlu, 😢 Üzgün, 😍 Aşık, 😠 Sinirli, 🤔 Düşünceli) mevcut duygu durumunuzu en iyi yansıtanı seçin.
+3. **Canlı Grafiği Görüntüleme**: Topluluğun duygu durumunu gösteren canlı grafikleri ve istatistikleri sayfada görüntüleyebilirsiniz.
+4. **İşlemleri Görüntüleme**: Emoji seçiminizden sonra, işleminiz Stellar Testnet'e kaydedilecek ve işleminize ait bağlantı görüntülenecektir.
 
 ## Geliştirme
 
