@@ -10,6 +10,7 @@ Mood Pulse App, kullanıcıların duygusal durumlarını emojiler aracılığıy
 - [Teknolojiler](#teknolojiler)
 - [Kurulum](#kurulum)
 - [Freighter Cüzdan Entegrasyonu](#freighter-cüzdan-entegrasyonu)
+- [Stellar Kontrat Bilgileri](#stellar-kontrat-bilgileri)
 - [Kullanım](#kullanım)
 - [Geliştirme](#geliştirme)
 - [Katkıda Bulunma](#katkıda-bulunma)
@@ -21,6 +22,7 @@ Mood Pulse App, kullanıcıların duygusal durumlarını emojiler aracılığıy
 - **Test Ağı Desteği**: Stellar Testnet ile uyumlu yapılandırma.
 - **Duygu Durumu Emojileri**: Kullanıcılar beş farklı emoji arasından seçim yaparak duygusal durumlarını belirtebilir.
 - **Canlı Grafik**: Topluluk içindeki duygu durumlarını gerçek zamanlı olarak gösteren grafikler.
+- **Blockchain Kayıtları**: Emoji seçimleri Stellar Testnet üzerinde işlem olarak kaydedilir.
 - **Responsive Tasarım**: Mobil cihazlar dahil tüm ekran boyutlarına uyumlu tasarım.
 
 ## Demo
@@ -74,12 +76,38 @@ Mood Pulse App, Stellar Blockchain üzerinde çalışan [Freighter Cüzdan](http
 3. Stellar Testnet'i seçin: `Settings > Network > Testnet`
 4. Testnet faucet'ten test tokenları alın: [Stellar Laboratory](https://laboratory.stellar.org/#account-creator?network=test)
 
+## Stellar Kontrat Bilgileri
+
+Mood Pulse App, emoji seçimlerini ve topluluk verilerini Stellar Testnet üzerinde kaydeder. Bu işlemler şu yöntemlerle gerçekleştirilir:
+
+### Kontrat ID
+
+Uygulama, aşağıdaki kontrat ID'sini kullanır:
+
+```
+CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC
+```
+
+### Stellar Explorer Bağlantıları
+
+- [Kontratı Stellar Explorer'da görüntüle](https://testnet.stellar.expert/contract/CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC)
+- [Testnet'teki tüm işlemleri görüntüle](https://testnet.stellar.expert/explorer/public)
+
+### İşlem Detayları
+
+Emoji seçimleri, Stellar işlemleri içinde aşağıdaki şekilde kaydedilir:
+
+1. Kullanıcı bir emoji seçtiğinde, Stellar Testnet üzerinde bir işlem oluşturulur
+2. Emoji ve duygu adı, işlem memo'sunda "MoodPulse: [emoji] - [duygu adı]" formatında saklanır
+3. Bu işlemler daha sonra topluluk istatistikleri için sorgulanır
+
 ## Kullanım
 
 1. **Cüzdan Bağlantısı**: Sayfanın üst kısmındaki "Cüzdan Bağla" butonuna tıklayarak Freighter cüzdanınızı bağlayın.
 2. **Duygu Seçimi**: Sunulan beş emoji seçeneğinden (😀 Mutlu, 😢 Üzgün, 😍 Aşık, 😠 Sinirli, 🤔 Düşünceli) mevcut duygu durumunuzu en iyi yansıtanı seçin.
 3. **Canlı Grafiği Görüntüleme**: Topluluğun duygu durumunu gösteren canlı grafikleri sayfanın orta kısmında görüntüleyebilirsiniz.
 4. **Katkıda Bulunma**: "Your Voice Matters" bölümünden kendi duygu durumunuzu ekleyebilirsiniz.
+5. **İşlemleri Görüntüleme**: Emoji seçiminizden sonra, Stellar Explorer bağlantısını kullanarak işleminizi görüntüleyebilirsiniz.
 
 ## Geliştirme
 
