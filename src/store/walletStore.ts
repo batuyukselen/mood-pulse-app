@@ -1,11 +1,22 @@
 import { create } from 'zustand';
 import freighterApi from "@stellar/freighter-api";
+import { StellarService } from '../utils/stellarService';
 
 interface WalletState {
   isConnected: boolean;
   address: string | null;
+  balance: string;
+  isLoading: boolean;
+  networkInfo: {
+    network: string;
+    networkUrl: string;
+    networkPassphrase: string;
+    sorobanRpcUrl: string | undefined;
+  } | null;
   connect: () => Promise<void>;
   disconnect: () => void;
+  refreshBalance: () => Promise<void>;
+  getNetworkInfo: () => Promise<void>;
 }
 
 // Freighter cüzdan için test ağı ayarları
@@ -22,85 +33,119 @@ const configureFreighterNetwork = async () => {
 // Uygulama başladığında Freighter ağ ayarlarını yap
 configureFreighterNetwork();
 
-export const useWalletStore = create<WalletState>((set) => ({
+export const useWalletStore = create<WalletState>((set, get) => ({
   isConnected: false,
   address: null,
+  balance: '0',
+  isLoading: false,
+  networkInfo: null,
   
   connect: async () => {
-    // Simulate connection delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    set({ isLoading: true });
     
-    // Önce Freighter cüzdan kontrolü yap
-    const freighterConnected = await freighterApi.isConnected();
-    
-    if (freighterConnected.isConnected) {
-      try {
-        // Kullanıcının izin verip vermediğini kontrol et
-        const hasPermission = await freighterApi.isAllowed();
-        
-        if (!hasPermission.isAllowed) {
-          console.log("Kullanıcı Freighter'a erişim izni vermedi, izin isteniyor...");
+    try {
+      // Önce Freighter cüzdan kontrolü yap
+      const freighterConnected = await freighterApi.isConnected();
+      
+      if (freighterConnected.isConnected) {
+        try {
+          // Kullanıcının izin verip vermediğini kontrol et
+          const hasPermission = await freighterApi.isAllowed();
           
-          // İzin iste
-          const permission = await freighterApi.setAllowed();
-          if (!permission.isAllowed) {
-            console.log("Kullanıcı izin vermedi");
+          if (!hasPermission.isAllowed) {
+            console.log("Kullanıcı Freighter'a erişim izni vermedi, izin isteniyor...");
+            
+            // İzin iste
+            const permission = await freighterApi.setAllowed();
+            if (!permission.isAllowed) {
+              console.log("Kullanıcı izin vermedi");
+              set({ isLoading: false });
+              return;
+            }
+          }
+          
+          // Freighter'dan public key'i al
+          const publicKey = await StellarService.getPublicKey();
+          
+          if (publicKey) {
+            console.log("Freighter cüzdanına bağlandı:", publicKey);
+            
+            // Cüzdan bilgilerini ayarla
+            set({ 
+              isConnected: true,
+              address: publicKey
+            });
+            
+            // Bakiye ve ağ bilgilerini al
+            await get().refreshBalance();
+            await get().getNetworkInfo();
+            
+            set({ isLoading: false });
             return;
           }
+        } catch (error) {
+          console.error("Freighter bağlantı hatası:", error);
+          set({ isLoading: false });
         }
-        
-        // Freighter'dan public key'i al
-        const addressData = await freighterApi.getAddress();
-        
-        if (addressData.address) {
-          console.log("Freighter cüzdanına bağlandı:", addressData.address);
-          set({ 
-            isConnected: true,
-            address: addressData.address
-          });
-          return;
-        }
-      } catch (error) {
-        console.error("Freighter bağlantı hatası:", error);
       }
-    }
-    
-    // Freighter bağlantısı başarısız olursa MetaMask kontrolü yap
-    if (typeof window !== 'undefined' && (window as any).ethereum) {
-      try {
-        const accounts = await (window as any).ethereum.request({ 
-          method: 'eth_requestAccounts' 
-        });
-        
-        if (accounts.length > 0) {
-          set({ 
-            isConnected: true,
-            address: accounts[0]
+      
+      // Freighter bağlantısı başarısız olursa MetaMask kontrolü yap
+      if (typeof window !== 'undefined' && (window as any).ethereum) {
+        try {
+          const accounts = await (window as any).ethereum.request({ 
+            method: 'eth_requestAccounts' 
           });
-          return;
+          
+          if (accounts.length > 0) {
+            set({ 
+              isConnected: true,
+              address: accounts[0],
+              isLoading: false
+            });
+            return;
+          }
+        } catch (error) {
+          console.error('Error connecting to MetaMask:', error);
         }
-      } catch (error) {
-        console.error('Error connecting to MetaMask:', error);
       }
+      
+      // Hiçbir cüzdan bağlantısı başarısız olursa, kullanıcıya bildir
+      console.warn('Gerçek cüzdan bulunamadı veya bağlantı hatası oluştu.');
+      set({ isLoading: false });
+    } catch (error) {
+      console.error('Wallet connection error:', error);
+      set({ isLoading: false });
     }
-    
-    // Hiçbir cüzdan bağlantısı başarısız olursa, simüle edilmiş adres kullanma
-    // Bu kısım geliştirme aşamasında test için kullanılabilir
-    const mockAddress = '0x' + Array(40).fill(0).map(() => 
-      Math.floor(Math.random() * 16).toString(16)
-    ).join('');
-    
-    console.warn('Gerçek cüzdan bulunamadı, test adresi kullanılıyor:', mockAddress);
-    set({ 
-      isConnected: true,
-      address: mockAddress
-    });
   },
   
   disconnect: () => {
     set({ 
       isConnected: false,
-      address: null
+      address: null,
+      balance: '0',
+      networkInfo: null
     });
+  },
+  
+  refreshBalance: async () => {
+    const { address } = get();
+    
+    if (!address) return;
+    
+    try {
+      const balance = await StellarService.getAccountBalance(address);
+      set({ balance });
+    } catch (error) {
+      console.error('Error refreshing balance:', error);
+    }
+  },
+  
+  getNetworkInfo: async () => {
+    try {
+      const networkInfo = await StellarService.getNetworkInfo();
+      set({ networkInfo });
+    } catch (error) {
+      console.error('Error getting network info:', error);
+    }
   }
 }));

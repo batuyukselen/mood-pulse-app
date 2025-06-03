@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Wallet } from 'lucide-react';
+import { Wallet, Loader2 } from 'lucide-react';
 import { useWalletStore } from '../../store/walletStore';
 import freighterApi from '@stellar/freighter-api';
 
@@ -8,8 +8,7 @@ interface WalletConnectProps {
 }
 
 const WalletConnect: React.FC<WalletConnectProps> = ({ isMobile = false }) => {
-  const { isConnected, connect, disconnect, address } = useWalletStore();
-  const [isLoading, setIsLoading] = useState(false);
+  const { isConnected, connect, disconnect, address, isLoading } = useWalletStore();
   const [freighterAvailable, setFreighterAvailable] = useState<boolean | null>(null);
   
   // Freighter cüzdanının mevcut olup olmadığını kontrol et
@@ -33,13 +32,10 @@ const WalletConnect: React.FC<WalletConnectProps> = ({ isMobile = false }) => {
       return;
     }
     
-    setIsLoading(true);
     try {
       await connect();
     } catch (error) {
       console.error('Failed to connect wallet:', error);
-    } finally {
-      setIsLoading(false);
     }
   };
   
@@ -83,7 +79,11 @@ const WalletConnect: React.FC<WalletConnectProps> = ({ isMobile = false }) => {
         isMobile ? 'w-full py-3' : 'px-4 py-2'
       }`}
     >
-      <Wallet size={18} className="mr-2" />
+      {isLoading ? (
+        <Loader2 size={18} className="mr-2 animate-spin" />
+      ) : (
+        <Wallet size={18} className="mr-2" />
+      )}
       <span>{getButtonText()}</span>
     </button>
   );
