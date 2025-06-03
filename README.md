@@ -1,176 +1,176 @@
 # Mood Pulse App
 
-Mood Pulse App, kullanıcıların duygusal durumlarını emojiler aracılığıyla ifade edebilecekleri ve topluluk içindeki duygu durumlarını gerçek zamanlı olarak görüntüleyebilecekleri bir web uygulamasıdır. Stellar Blockchain ağı üzerinde çalışan bu uygulama, Freighter cüzdan entegrasyonu ile birlikte güvenli bir kullanıcı deneyimi sunmaktadır.
+Mood Pulse App is a web application where users can express their emotional states through emojis and view the emotional states within the community in real-time. This application, running on the Stellar Blockchain network, provides a secure user experience with Freighter wallet integration.
 
 
-## İçindekiler
+## Table of Contents
 
-- [Özellikler](#özellikler)
+- [Features](#features)
 - [Demo](#demo)
-- [Teknolojiler](#teknolojiler)
-- [Kurulum](#kurulum)
-- [Freighter Cüzdan Entegrasyonu](#freighter-cüzdan-entegrasyonu)
-- [Stellar Kontrat Bilgileri](#stellar-kontrat-bilgileri)
-- [Kendi Stellar Kontrat ID'nizi Kullanma](#kendi-stellar-kontrat-idnizi-kullanma)
-- [Kullanım](#kullanım)
-- [Geliştirme](#geliştirme)
-- [Katkıda Bulunma](#katkıda-bulunma)
-- [Lisans](#lisans)
+- [Technologies](#technologies)
+- [Installation](#installation)
+- [Freighter Wallet Integration](#freighter-wallet-integration)
+- [Stellar Contract Information](#stellar-contract-information)
+- [Using Your Own Stellar Contract ID](#using-your-own-stellar-contract-id)
+- [Usage](#usage)
+- [Development](#development)
+- [Contributing](#contributing)
+- [License](#license)
 
-## Özellikler
+## Features
 
-- **Freighter Cüzdan Bağlantısı**: Kullanıcılar Stellar Blockchain üzerinde çalışan Freighter cüzdanlarını uygulamaya bağlayabilir.
-- **Test Ağı Desteği**: Stellar Testnet ile uyumlu yapılandırma.
-- **Duygu Durumu Emojileri**: Kullanıcılar beş farklı emoji arasından seçim yaparak duygusal durumlarını belirtebilir.
-- **Canlı Grafik**: Topluluk içindeki duygu durumlarını gerçek zamanlı olarak gösteren grafikler.
-- **Blockchain Kayıtları**: Emoji seçimleri Stellar Testnet üzerinde işlem olarak kaydedilir.
-- **Responsive Tasarım**: Mobil cihazlar dahil tüm ekran boyutlarına uyumlu tasarım.
-- **Modern Hooks API**: React Hooks kullanılarak geliştirilen modern API yapısı.
-- **Gelişmiş Hata Yönetimi**: Kullanıcı dostu hata mesajları ve izleme.
+- **Freighter Wallet Connection**: Users can connect their Freighter wallets running on the Stellar Blockchain to the application.
+- **Testnet Support**: Configuration compatible with Stellar Testnet.
+- **Mood Emojis**: Users can indicate their emotional state by selecting from five different emojis.
+- **Live Chart**: Charts showing the emotional states within the community in real-time.
+- **Blockchain Records**: Emoji selections are recorded as transactions on the Stellar Testnet.
+- **Responsive Design**: Design compatible with all screen sizes, including mobile devices.
+- **Modern Hooks API**: Modern API structure developed using React Hooks.
+- **Advanced Error Handling**: User-friendly error messages and tracking.
 
 ## Demo
 
-Uygulamanın canlı demo sürümüne [buradan](https://mood-pulse-app.netlify.app) erişebilirsiniz.
+You can access the live demo version of the application [here](https://mood-pulse-app.netlify.app).
 
-## Teknolojiler
+## Technologies
 
-Bu projede kullanılan başlıca teknolojiler:
+Main technologies used in this project:
 
 - **Frontend**: React, TypeScript, TailwindCSS
 - **Blockchain**: Stellar Network, Soroban Smart Contracts
-- **Cüzdan Entegrasyonu**: Freighter API
-- **Build Araçları**: Vite, PostCSS
-- **State Yönetimi**: Zustand
+- **Wallet Integration**: Freighter API
+- **Build Tools**: Vite, PostCSS
+- **State Management**: Zustand
 
-## Kurulum
+## Installation
 
-Projeyi yerel ortamınızda çalıştırmak için şu adımları izleyin:
+Follow these steps to run the project in your local environment:
 
-1. Projeyi klonlayın:
+1. Clone the project:
 ```bash
 git clone https://github.com/batuyukselen/mood-pulse-app.git
 cd mood-pulse-app
 ```
 
-2. Gerekli paketleri yükleyin:
+2. Install the necessary packages:
 ```bash
 npm install
 ```
 
-3. Geliştirme sunucusunu başlatın:
+3. Start the development server:
 ```bash
 npm run dev
 ```
 
-4. Tarayıcınızda `http://localhost:5173` adresine giderek uygulamayı görüntüleyin.
+4. Go to `http://localhost:5173` in your browser to view the application.
 
-## Freighter Cüzdan Entegrasyonu
+## Freighter Wallet Integration
 
-Mood Pulse App, Stellar Blockchain üzerinde çalışan [Freighter Cüzdan](https://www.freighter.app/) entegrasyonu ile kullanıcıların blockchain üzerinde işlem yapabilmelerini sağlar. Bu entegrasyon sayesinde:
+Mood Pulse App enables users to perform transactions on the blockchain with [Freighter Wallet](https://www.freighter.app/) integration running on the Stellar Blockchain. Thanks to this integration:
 
-- Kullanıcılar uygulamaya güvenli bir şekilde bağlanabilir
-- Stellar Testnet ağı üzerinde işlemler gerçekleştirebilir
-- Cüzdan adresini görüntüleyebilir
+- Users can securely connect to the application
+- Perform transactions on the Stellar Testnet network
+- View their wallet address
 
-### Freighter Kurulumu
+### Freighter Setup
 
-1. [Freighter Cüzdanı](https://www.freighter.app/) tarayıcı eklentisi olarak yükleyin
-2. Yeni bir cüzdan oluşturun veya mevcut bir cüzdanı import edin
-3. Stellar Testnet'i seçin: `Settings > Network > Testnet`
-4. Testnet faucet'ten test tokenları alın: [Stellar Laboratory](https://laboratory.stellar.org/#account-creator?network=test)
+1. Install [Freighter Wallet](https://www.freighter.app/) as a browser extension
+2. Create a new wallet or import an existing wallet
+3. Select Stellar Testnet: `Settings > Network > Testnet`
+4. Get test tokens from the Testnet faucet: [Stellar Laboratory](https://laboratory.stellar.org/#account-creator?network=test)
 
-## Stellar Kontrat Bilgileri
+## Stellar Contract Information
 
-Mood Pulse App, emoji seçimlerini ve topluluk verilerini Stellar Testnet üzerinde kaydeder. Bu işlemler şu yöntemlerle gerçekleştirilir:
+Mood Pulse App records emoji selections and community data on the Stellar Testnet. These processes are carried out using the following methods:
 
-### İşlem Kayıt Adresi
+### Transaction Recording Address
 
-Uygulamanın kullandığı Stellar adresi:
+The Stellar address used by the application:
 
 ```
 GAO3FFNMP7VYDBYPOUMMU7URGUM2QGLK5AXYZVEZVATAHPO72SRIKVMA
 ```
 
-### Stellar Explorer Bağlantıları
+### Stellar Explorer Links
 
-- [İşlem kaydı adresini Stellar Explorer'da görüntüle](https://stellar.expert/explorer/testnet/account/GAO3FFNMP7VYDBYPOUMMU7URGUM2QGLK5AXYZVEZVATAHPO72SRIKVMA)
-- [Testnet'teki tüm işlemleri görüntüle](https://testnet.stellar.expert/explorer/public)
+- [View the transaction recording address in Stellar Explorer](https://stellar.expert/explorer/testnet/account/GAO3FFNMP7VYDBYPOUMMU7URGUM2QGLK5AXYZVEZVATAHPO72SRIKVMA)
+- [View all transactions on Testnet](https://testnet.stellar.expert/explorer/public)
 
-### İşlem Detayları
+### Transaction Details
 
-Emoji seçimleri, Stellar işlemleri içinde aşağıdaki şekilde kaydedilir:
+Emoji selections are recorded in Stellar transactions as follows:
 
-1. Kullanıcı bir emoji seçtiğinde, Stellar Testnet üzerinde bir işlem oluşturulur
-2. Emoji ve duygu adı, işlem memo'sunda "MoodPulse: [emoji] - [duygu adı]" formatında saklanır
-3. Bu işlemler daha sonra topluluk istatistikleri için sorgulanır
+1. When a user selects an emoji, a transaction is created on the Stellar Testnet
+2. The emoji and mood name are stored in the transaction memo in the format "MoodPulse: [emoji] - [mood name]"
+3. These transactions are then queried for community statistics
 
-## Kendi Stellar Kontrat ID'nizi Kullanma
+## Using Your Own Stellar Contract ID
 
-Uygulamayı kendi Stellar Testnet adresinizle kullanmak için aşağıdaki adımları izleyin:
+Follow these steps to use the application with your own Stellar Testnet address:
 
-### Ön Gereksinimler
+### Prerequisites
 
-- [Freighter Wallet](https://www.freighter.app/) tarayıcı uzantısı
-- Stellar Testnet'te bir hesap (Testnet XLM bakiyesi olmalı)
-- Node.js ve npm kurulu olmalı
+- [Freighter Wallet](https://www.freighter.app/) browser extension
+- An account on Stellar Testnet (must have Testnet XLM balance)
+- Node.js and npm installed
 
-### Kurulum Adımları
+### Setup Steps
 
-1. Kolay kurulum için sağlanan yardımcı komut dosyasını kullanın:
+1. Use the provided helper script for easy setup:
 
 ```bash
 npm run deploy-contract
 ```
 
-Bu komut, aşağıdaki işlemleri otomatik olarak gerçekleştirecektir:
-- Var olan bir Stellar adresini kullanabilir veya yeni bir adres oluşturabilirsiniz
-- Kontrat ID'sini güncelleme
-- Testnet XLM bakiyenizi kontrol etme
-- Hesap oluşturma ve fonlama (gerekirse)
-- Uygulamayı başlatma
+This command will automatically perform the following actions:
+- You can use an existing Stellar address or create a new one
+- Update the Contract ID
+- Check your Testnet XLM balance
+- Create and fund an account (if necessary)
+- Start the application
 
-2. Manuel Güncelleme (Alternatif):
+2. Manual Update (Alternative):
 
-Yardımcı komut çalışmazsa, aşağıdaki dosyayı manuel olarak düzenleyebilirsiniz:
+If the helper command doesn't work, you can manually edit the following file:
 
 ```bash
 src/utils/stellarConstants.ts
 ```
 
-`MOODPULSE_CONTRACT_ID` değişkenini kendi Stellar adresinizle güncelleyin:
+Update the `MOODPULSE_CONTRACT_ID` variable with your own Stellar address:
 
 ```typescript
-export const MOODPULSE_CONTRACT_ID = 'KENDI_STELLAR_ADRESINIZ';
+export const MOODPULSE_CONTRACT_ID = 'YOUR_STELLAR_ADDRESS';
 ```
 
-### Testnet XLM Alma
+### Getting Testnet XLM
 
-Hesabınıza Testnet XLM almak için Stellar Testnet Friendbot'u kullanabilirsiniz:
+You can use the Stellar Testnet Friendbot to get Testnet XLM for your account:
 
 ```
-https://friendbot.stellar.org/?addr=KENDI_STELLAR_ADRESINIZ
+https://friendbot.stellar.org/?addr=YOUR_STELLAR_ADDRESS
 ```
 
-## Kullanım
+## Usage
 
-1. **Cüzdan Bağlantısı**: Sayfanın üst kısmındaki "Cüzdan Bağla" butonuna tıklayarak Freighter cüzdanınızı bağlayın.
-2. **Duygu Seçimi**: "How are you feeling today?" başlığı altında sunulan emoji seçeneklerinden (😀 Mutlu, 😢 Üzgün, 😍 Aşık, 😠 Sinirli, 🤔 Düşünceli) mevcut duygu durumunuzu en iyi yansıtanı seçin.
-3. **Canlı Grafiği Görüntüleme**: Topluluğun duygu durumunu gösteren canlı grafikleri ve istatistikleri sayfada görüntüleyebilirsiniz.
-4. **İşlemleri Görüntüleme**: Emoji seçiminizden sonra, işleminiz Stellar Testnet'e kaydedilecek ve işleminize ait bağlantı görüntülenecektir.
+1. **Wallet Connection**: Connect your Freighter wallet by clicking the "Connect Wallet" button at the top of the page.
+2. **Mood Selection**: Select the emoji that best reflects your current emotional state from the emoji options (😀 Happy, 😢 Sad, 😍 In Love, 😠 Angry, 🤔 Thoughtful) presented under the "How are you feeling today?" heading.
+3. **View Live Chart**: You can view live charts and statistics showing the emotional state of the community on the page.
+4. **View Transactions**: After your emoji selection, your transaction will be recorded on the Stellar Testnet and a link to your transaction will be displayed.
 
-## Stellar Testnet Sürümü
+## Stellar Testnet Version
 
-Mood Pulse App'in şu anki sürümü, Stellar Testnet ağı üzerinde aktif olarak çalışmaktadır. Uygulama, aşağıdaki Stellar Testnet adresini kullanır:
+The current version of Mood Pulse App is actively running on the Stellar Testnet network. The application uses the following Stellar Testnet address:
 
 ```
 GAO3FFNMP7VYDBYPOUMMU7URGUM2QGLK5AXYZVEZVATAHPO72SRIKVMA
 ```
 
-Bu adres, uygulama için özel olarak oluşturulmuş ve Testnet XLM ile fonlanmıştır. Bu adresi [Stellar Expert Explorer](https://stellar.expert/explorer/testnet/account/GAO3FFNMP7VYDBYPOUMMU7URGUM2QGLK5AXYZVEZVATAHPO72SRIKVMA)'da görüntüleyebilirsiniz.
+This address was specially created for the application and funded with Testnet XLM. You can view this address in [Stellar Expert Explorer](https://stellar.expert/explorer/testnet/account/GAO3FFNMP7VYDBYPOUMMU7URGUM2QGLK5AXYZVEZVATAHPO72SRIKVMA).
 
-## Geliştirme
+## Development
 
-### Proje Yapısı
+### Project Structure
 
 ```
 mood-pulse-app/
@@ -188,31 +188,31 @@ mood-pulse-app/
 └── package.json
 ```
 
-### Zustand Store'ları
+### Zustand Stores
 
-Uygulama iki ana store kullanır:
-- `walletStore.ts`: Freighter cüzdan bağlantısı ve kullanıcı adresini yönetir
-- `emojiStore.ts`: Emoji seçimlerini ve istatistiklerini yönetir
+The application uses two main stores:
+- `walletStore.ts`: Manages Freighter wallet connection and user address
+- `emojiStore.ts`: Manages emoji selections and statistics
 
 ### React Hooks
 
-Uygulama, modern bir yapı için özel hooks kullanır:
-- `useStellar.ts`: Stellar blockchain entegrasyonu için özel hook
+The application uses custom hooks for a modern structure:
+- `useStellar.ts`: Custom hook for Stellar blockchain integration
 
-## Katkıda Bulunma
+## Contributing
 
-Bu projeye katkıda bulunmak istiyorsanız:
+If you want to contribute to this project:
 
-1. Projeyi forklayın
-2. Feature branch'i oluşturun (`git checkout -b feature/amazing-feature`)
-3. Değişikliklerinizi commit edin (`git commit -m 'Add some amazing feature'`)
-4. Branch'inize push edin (`git push origin feature/amazing-feature`)
-5. Pull Request açın
+1. Fork the project
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-## Lisans
+## License
 
-Bu proje MIT lisansı altında lisanslanmıştır. Daha fazla bilgi için `LICENSE` dosyasına bakın.
+This project is licensed under the MIT License. See the `LICENSE` file for more information.
 
 ---
 
-Geliştirici: [Batuhan Yükselen](https://github.com/batuyukselen) 
+Developer: [Batuhan Yükselen](https://github.com/batuyukselen)
