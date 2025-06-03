@@ -19,17 +19,21 @@ export const STELLAR_NETWORKS = {
 };
 
 // Default network
-export const DEFAULT_NETWORK = STELLAR_NETWORKS.TESTNET;
+export const DEFAULT_NETWORK = {
+  network: 'TESTNET',
+  networkUrl: 'https://horizon-testnet.stellar.org',
+  networkPassphrase: 'Test SDF Network ; September 2015',
+  sorobanRpcUrl: 'https://soroban-testnet.stellar.org'
+};
 
-// Contract ID - Using a transaction-based approach instead of a specific contract
-// Since we're using Stellar transactions to record emoji votes
-export const MOODPULSE_CONTRACT_ID = 'GBZX4364PEPQTDICVS7GONLMPJEQ6TRT6IMEZWZT4KKSMEDW2HTQRSG6';
+// Contract ID - This should be updated with the user's own deployed contract ID
+// This is the address that will receive emoji vote transactions
+export const MOODPULSE_CONTRACT_ID = 'GAO3FFNMP7VYDBYPOUMMU7URGUM2QGLK5AXYZVEZVATAHPO72SRIKVMA';
 
 // Known contract functions
 export const CONTRACT_FUNCTIONS = {
-  RECORD_EMOJI: 'record_emoji',
-  GET_EMOJI_DATA: 'get_emoji_data',
-  GET_TOTAL_VOTES: 'get_total_votes'
+  recordEmoji: 'record_emoji',
+  getEmojis: 'get_emojis'
 };
 
 // Transaction settings

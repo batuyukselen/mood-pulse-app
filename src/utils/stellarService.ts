@@ -6,6 +6,14 @@ import {
   CONTRACT_FUNCTIONS, 
   TX_SETTINGS 
 } from './stellarConstants';
+import { EMOJI_DATA } from './constants';
+
+// Freighter window tipi tanımı
+declare global {
+  interface Window {
+    freighter?: any;
+  }
+}
 
 // Initialize the Stellar server connection
 const horizonServer = new StellarSdk.Horizon.Server(DEFAULT_NETWORK.networkUrl);
@@ -20,14 +28,12 @@ export class StellarService {
       // Check if Freighter is connected
       const isConnected = await freighterApi.isConnected();
       if (!isConnected.isConnected) {
-        console.error('Freighter is not connected');
         return null;
       }
 
       // Check if user has granted permission
       const hasPermission = await freighterApi.isAllowed();
       if (!hasPermission.isAllowed) {
-        console.error('User has not granted permission to Freighter');
         return null;
       }
 
@@ -35,8 +41,28 @@ export class StellarService {
       const addressData = await freighterApi.getAddress();
       return addressData.address || null;
     } catch (error) {
-      console.error('Error getting public key:', error);
       return null;
+    }
+  }
+
+  /**
+   * Check if Freighter wallet is available and connected
+   */
+  static async isWalletAvailable(): Promise<boolean> {
+    try {
+      // Check if window object exists (browser environment)
+      if (typeof window === 'undefined') return false;
+      
+      // Check if Freighter is installed
+      if (!window.freighter) {
+        return false;
+      }
+      
+      // Check if Freighter is connected
+      const isConnected = await freighterApi.isConnected();
+      return isConnected.isConnected;
+    } catch (error) {
+      return false;
     }
   }
 
@@ -49,7 +75,6 @@ export class StellarService {
       const account = await horizonServer.loadAccount(publicKey);
       return account;
     } catch (error) {
-      console.error('Error loading account:', error);
       throw error;
     }
   }
@@ -72,7 +97,6 @@ export class StellarService {
       
       return balance ? balance.balance : '0';
     } catch (error) {
-      console.error('Error getting account balance:', error);
       return '0';
     }
   }
@@ -129,7 +153,6 @@ export class StellarService {
       const result = await horizonServer.submitTransaction(signedTransaction);
       return result;
     } catch (error) {
-      console.error('Error sending payment:', error);
       throw error;
     }
   }
@@ -153,7 +176,6 @@ export class StellarService {
         sorobanRpcUrl: networkInfo.sorobanRpcUrl
       };
     } catch (error) {
-      console.error('Error getting network info:', error);
       throw error;
     }
   }
@@ -175,7 +197,6 @@ export class StellarService {
       const result = await response.json();
       return result;
     } catch (error) {
-      console.error('Error creating testnet account:', error);
       throw error;
     }
   }
@@ -200,10 +221,10 @@ export class StellarService {
         fee: TX_SETTINGS.baseFee,
         networkPassphrase: DEFAULT_NETWORK.networkPassphrase
       })
-        // Add a payment to self with minimum amount (0.0000001 XLM)
+        // Add a payment to the contract address - this allows the contract to track votes
         .addOperation(
           StellarSdk.Operation.payment({
-            destination: sourcePublicKey, // Payment to self
+            destination: MOODPULSE_CONTRACT_ID, // Payment to contract address
             asset: StellarSdk.Asset.native(),
             amount: '0.0000001' // Minimum amount
           })
@@ -216,41 +237,35 @@ export class StellarService {
       // Convert transaction to XDR
       const xdr = transaction.toXDR();
       
-      // Sign with Freighter
-      const signedResponse = await freighterApi.signTransaction(xdr, {
-        networkPassphrase: DEFAULT_NETWORK.networkPassphrase
-      });
-      
-      if (signedResponse.error) {
-        throw new Error(signedResponse.error);
-      }
-      
-      // Convert signed XDR back to transaction
-      const signedTransaction = StellarSdk.TransactionBuilder.fromXDR(
-        signedResponse.signedTxXdr,
-        DEFAULT_NETWORK.networkPassphrase
-      );
-      
-      // Submit the transaction
-      const result = await horizonServer.submitTransaction(signedTransaction);
-      
-      // Also record to the Soroban contract (future enhancement)
+      // Sign with Freighter - modern approach using async/await
       try {
-        await this.recordEmojiToContract(emoji, name);
-      } catch (contractError) {
-        console.error('Failed to record to contract, but main transaction succeeded:', contractError);
-        // Ignore contract errors - the main transaction was successful
+        const signedResponse = await freighterApi.signTransaction(xdr, {
+          networkPassphrase: DEFAULT_NETWORK.networkPassphrase
+        });
+        
+        if (signedResponse.error) {
+          throw new Error(signedResponse.error);
+        }
+        
+        // Convert signed XDR back to transaction
+        const signedTransaction = StellarSdk.TransactionBuilder.fromXDR(
+          signedResponse.signedTxXdr,
+          DEFAULT_NETWORK.networkPassphrase
+        );
+        
+        // Submit the transaction
+        const result = await horizonServer.submitTransaction(signedTransaction);
+        
+        return {
+          success: true,
+          transactionHash: result.hash,
+          emoji,
+          name
+        };
+      } catch (error) {
+        throw new Error(`Transaction signing failed: ${error instanceof Error ? error.message : String(error)}`);
       }
-      
-      return {
-        success: true,
-        transactionHash: result.hash,
-        emoji,
-        name,
-        contractId: MOODPULSE_CONTRACT_ID
-      };
     } catch (error) {
-      console.error('Error recording emoji selection:', error);
       throw error;
     }
   }
@@ -268,129 +283,93 @@ export class StellarService {
         throw new Error('Source public key not available');
       }
       
-      // We're using a simpler approach for now since the contract isn't deployed yet
-      console.log(`Would record emoji ${emoji} (${name}) to contract ${MOODPULSE_CONTRACT_ID}`);
-      
       return {
         success: true,
         contractId: MOODPULSE_CONTRACT_ID
       };
     } catch (error) {
-      console.error('Error recording emoji to contract:', error);
-      // Don't throw - this is an enhancement, not critical
       return null;
     }
   }
 
   /**
-   * Fetch community emoji selections from Stellar Testnet
-   * This method retrieves recent transactions with MoodPulse memos
-   * @param limit Maximum number of transactions to retrieve
+   * Get community emoji data from Stellar transactions
+   * @param limit The maximum number of records to retrieve
    */
   static async getCommunityEmojis(limit = 100) {
     try {
-      // Try to get data from the contract first
-      const contractData = await this.getEmojiDataFromContract();
-      
-      // Fallback to transaction history if contract data is unavailable
-      const transactions = await horizonServer
-        .transactions()
-        .limit(limit)
-        .order('desc')
-        .call();
-      
-      // Extract emoji data from transaction memos
-      const communityEmojis = [];
-      
-      for (const transaction of transactions.records) {
-        try {
-          // Fetch transaction details to get the memo
-          const txDetails = await horizonServer.transactions().transaction(transaction.hash).call();
-          
-          // Check if memo exists and starts with MoodPulse
-          if (txDetails.memo && txDetails.memo_type === 'text' && txDetails.memo.startsWith(TX_SETTINGS.memoPrefix)) {
-            // Extract emoji from memo (format: "MoodPulse: 😊 - Happy")
-            const memoText = txDetails.memo;
-            const emojiMatch = memoText.match(new RegExp(`${TX_SETTINGS.memoPrefix}(.*?) -`));
-            
-            if (emojiMatch && emojiMatch[1]) {
-              const emoji = emojiMatch[1].trim();
-              
-              // Extract name
-              const nameMatch = memoText.match(/- (.*?)$/);
-              const name = nameMatch && nameMatch[1] ? nameMatch[1].trim() : 'Unknown';
-              
-              // Get color based on name
-              let color = '#9C27B0'; // Default purple
-              
-              switch (name.toLowerCase()) {
-                case 'happy':
-                  color = '#4CAF50'; // Green
-                  break;
-                case 'sad':
-                  color = '#2196F3'; // Blue
-                  break;
-                case 'angry':
-                  color = '#F44336'; // Red
-                  break;
-                case 'neutral':
-                  color = '#FFC107'; // Amber
-                  break;
-                case 'surprised':
-                  color = '#FF9800'; // Orange
-                  break;
-              }
-              
-              communityEmojis.push({
-                emoji,
-                name,
-                color,
-                count: 1, // Each transaction represents one vote
-                timestamp: new Date(txDetails.created_at).getTime()
-              });
-            }
-          }
-        } catch (error) {
-          console.error(`Error processing transaction ${transaction.hash}:`, error);
-          // Continue with next transaction
-          continue;
-        }
-      }
-      
-      // Aggregate counts for the same emoji
-      interface EmojiCountItem {
-        emoji: string;
-        name: string;
-        count: number;
-        color: string;
-      }
-      
-      const emojiCounts: Record<string, EmojiCountItem> = {};
-      
-      communityEmojis.forEach((item: any) => {
-        if (!emojiCounts[item.emoji]) {
-          emojiCounts[item.emoji] = {
-            emoji: item.emoji,
-            name: item.name,
-            count: 0,
-            color: item.color
-          };
+      // Query payments to the contract address with improved error handling
+      try {
+        const payments = await horizonServer.payments()
+          .forAccount(MOODPULSE_CONTRACT_ID)
+          .limit(limit)
+          .order('desc')
+          .call();
+
+        if (!payments.records || payments.records.length === 0) {
+          return [];
         }
         
-        emojiCounts[item.emoji].count += 1;
-      });
-      
-      // Calculate percentages
-      const totalCount = Object.values(emojiCounts).reduce((sum: number, item: EmojiCountItem) => sum + item.count, 0);
-      
-      const result = Object.values(emojiCounts).map((item: EmojiCountItem) => ({
-        ...item,
-        percentage: totalCount > 0 ? (item.count / totalCount) * 100 : 0
-      }));
-      
-      return result;
+        // Process the payments to extract emoji data
+        const emojiData = new Map();
+        
+        for (const payment of payments.records) {
+          try {
+            // Get the transaction to check the memo
+            const transaction = await horizonServer.transactions()
+              .transaction(payment.transaction_hash)
+              .call();
+            
+            if (transaction.memo_type === 'text' && transaction.memo && transaction.memo.startsWith(TX_SETTINGS.memoPrefix)) {
+              // Extract emoji and name from memo text
+              const emojiPart = transaction.memo.replace(TX_SETTINGS.memoPrefix, '');
+              const parts = emojiPart.split(' - ');
+              
+              if (parts.length === 2) {
+                const emoji = parts[0].trim();
+                const name = parts[1].trim();
+                
+                // Find color for the emoji
+                const emojiInfo = EMOJI_DATA.find((e) => e.icon === emoji);
+                const color = emojiInfo ? emojiInfo.color : '#777777';
+                
+                // Update count for this emoji
+                if (emojiData.has(emoji)) {
+                  emojiData.set(emoji, {
+                    ...emojiData.get(emoji),
+                    count: emojiData.get(emoji).count + 1
+                  });
+                } else {
+                  emojiData.set(emoji, {
+                    emoji,
+                    name,
+                    count: 1,
+                    color
+                  });
+                }
+              }
+            }
+          } catch (error) {
+            // Skip this transaction and continue with others
+            continue;
+          }
+        }
+        
+        // Convert map to array
+        const result = Array.from(emojiData.values());
+        
+        // Calculate percentages
+        const totalCount = result.reduce((sum, item) => sum + item.count, 0);
+        result.forEach(item => {
+          item.percentage = totalCount > 0 ? (item.count / totalCount) * 100 : 0;
+        });
+        
+        return result;
+      } catch (error) {
+        // Return a helpful error message
+        throw new Error(`Failed to fetch payments: ${error instanceof Error ? error.message : String(error)}`);
+      }
     } catch (error) {
-      console.error('Error fetching community emojis:', error);
       return [];
     }
   }
@@ -406,14 +385,37 @@ export class StellarService {
         return null;
       }
       
-      // This is a placeholder for when the contract is actually available
-      console.log(`Would query contract ${MOODPULSE_CONTRACT_ID} for emoji data`);
-      
       // Return null for now to fall back to transaction-based data
       return null;
     } catch (error) {
-      console.error('Error getting emoji data from contract:', error);
       return null;
+    }
+  }
+
+  /**
+   * Check if an account exists on the Stellar network
+   * @param publicKey The account public key to check
+   */
+  static async accountExists(publicKey: string): Promise<boolean> {
+    try {
+      await horizonServer.loadAccount(publicKey);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+  
+  /**
+   * Validate a Stellar address
+   * @param address The Stellar address to validate
+   */
+  static isValidStellarAddress(address: string): boolean {
+    // Check if it's a valid Stellar public key format
+    try {
+      StellarSdk.StrKey.decodeEd25519PublicKey(address);
+      return true;
+    } catch (error) {
+      return false;
     }
   }
 } 

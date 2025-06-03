@@ -18,9 +18,11 @@ interface EmojiState {
   lastTransactionHash: string | null;
   stellarEmojis: EmojiCount[];
   isLoadingStellarData: boolean;
+  stellarError: string | null;
   selectEmoji: (emoji: string, name: string) => Promise<void>;
   resetSelection: () => void;
   fetchCommunityEmojis: () => Promise<void>;
+  clearError: () => void;
 }
 
 // Initialize with all emojis from constants
@@ -45,6 +47,7 @@ export const useEmojiStore = create<EmojiState>((set, get) => ({
   lastTransactionHash: null,
   stellarEmojis: [],
   isLoadingStellarData: false,
+  stellarError: null,
   
   selectEmoji: async (emoji, name) => {
     // Get current wallet connection status
@@ -69,7 +72,8 @@ export const useEmojiStore = create<EmojiState>((set, get) => ({
         
         return { 
           emojiCounts: updatedCounts, 
-          selectedEmoji: emoji
+          selectedEmoji: emoji,
+          stellarError: null
         };
       });
       
@@ -77,7 +81,7 @@ export const useEmojiStore = create<EmojiState>((set, get) => ({
     }
     
     // Wallet is connected, record the selection on Stellar blockchain
-    set({ isSubmitting: true });
+    set({ isSubmitting: true, stellarError: null });
     
     try {
       // Record emoji selection on Stellar
@@ -113,17 +117,30 @@ export const useEmojiStore = create<EmojiState>((set, get) => ({
       });
       
       // After recording the emoji, fetch updated community data
-      get().fetchCommunityEmojis();
-      
-      // Show success notification
-      alert(`Emoji seçiminiz Stellar Testnet ağına başarıyla kaydedildi!\nİşlem Hash: ${result.transactionHash}\nStellar Explorer'da görüntüleyebilirsiniz: https://testnet.stellar.expert/tx/${result.transactionHash}`);
+      setTimeout(() => {
+        get().fetchCommunityEmojis();
+      }, 1000); // Wait a second for the transaction to be included in the network
       
     } catch (error) {
-      console.error('Error recording emoji on Stellar:', error);
-      set({ isSubmitting: false });
+      // Show more specific error message
+      let errorMessage = 'Emoji seçimi kaydedilemedi.';
       
-      // Show error notification
-      alert('Emoji seçimi kaydedilemedi. Lütfen Freighter cüzdanınızın bağlı olduğundan ve Testnet seçili olduğundan emin olun.');
+      if (error instanceof Error) {
+        if (error.message.includes('op_underfunded')) {
+          errorMessage = 'Cüzdanınızda yeterli bakiye yok. Testnet için faucet\'ten XLM alabilirsiniz.';
+        } else if (error.message.includes('tx_bad_auth')) {
+          errorMessage = 'İşlem yetkilendirme hatası. Lütfen Freighter cüzdanınızı kontrol edin.';
+        } else if (error.message.includes('tx_bad_seq')) {
+          errorMessage = 'İşlem sıra numarası hatası. Lütfen sayfayı yenileyip tekrar deneyin.';
+        } else {
+          errorMessage = `Hata: ${error.message}`;
+        }
+      }
+      
+      set({ 
+        isSubmitting: false,
+        stellarError: errorMessage
+      });
       
       // Still update local UI
       set((state) => {
@@ -148,11 +165,15 @@ export const useEmojiStore = create<EmojiState>((set, get) => ({
   },
   
   resetSelection: () => {
-    set({ selectedEmoji: null });
+    set({ selectedEmoji: null, stellarError: null });
+  },
+  
+  clearError: () => {
+    set({ stellarError: null });
   },
   
   fetchCommunityEmojis: async () => {
-    set({ isLoadingStellarData: true });
+    set({ isLoadingStellarData: true, stellarError: null });
     
     try {
       // Fetch emoji data from Stellar network
@@ -188,9 +209,14 @@ export const useEmojiStore = create<EmojiState>((set, get) => ({
         isLoadingStellarData: false 
       });
       
-      console.log('Community emojis updated from Stellar network:', completeEmojiData);
     } catch (error) {
-      console.error('Error fetching community emojis:', error);
+      let errorMessage = 'Topluluk verilerini alırken bir hata oluştu.';
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      
+      // Set error state
+      set({ stellarError: errorMessage });
       
       // Fallback to local emoji counts on error
       set((state) => ({ 

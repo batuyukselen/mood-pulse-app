@@ -3,6 +3,7 @@ import Button from '../ui/Button';
 import WalletStatus from '../ui/WalletStatus';
 import { useWalletStore } from '../../store/walletStore';
 import HeroIllustration from '../ui/HeroIllustration';
+import EmojiSelector from '../ui/EmojiSelector';
 
 const HeroSection: React.FC = () => {
   const { isConnected } = useWalletStore();
@@ -40,6 +41,10 @@ const HeroSection: React.FC = () => {
             </div>
             
             <WalletStatus />
+            
+            <div className="mt-8 bg-white p-6 rounded-lg shadow-sm">
+              <EmojiSelector />
+            </div>
           </div>
           
           <div className="hidden lg:block">
